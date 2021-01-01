@@ -1004,16 +1004,13 @@ let counterValid = 0;
 for (let i = 0; i < lines.length; i++) {
   let currentLine = lines[i];
   let lineAttributes = currentLine.split(" ");
-  let quantities = lineAttributes[0].split("-");
+  let positions = lineAttributes[0].split("-");
   let letter = lineAttributes[1].replace(":", "");
   let pass = lineAttributes[2];
-  let counterLetters = 0;
-  for (let j = 0; j < pass.length; j++) {
-    if (pass[j] === letter) {
-      counterLetters++;
-    }
+  if (pass[positions[0] - 1] === letter && pass[positions[1] - 1] !== letter) {
+    counterValid++;
   }
-  if (counterLetters >= quantities[0] && counterLetters <= quantities[1]) {
+  if (pass[positions[1] - 1] === letter && pass[positions[0] - 1] !== letter) {
     counterValid++;
   }
 }
