@@ -997,16 +997,25 @@ hcl:a3046e pid:626863952 ecl:lzr iyr:2029 eyr:2024 byr:2000 hgt:193cm
 
 cid:244
 hcl:#866857 ecl:amb byr:1931
-eyr:1928 pid:557376401 hgt:182cm iyr:2013`;
+eyr:1928 pid:557376401 hgt:182cm iyr:2013
+`;
 
-const details = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
+const details = [
+  /byr:(19[2-9][0-9]|200[1-2])/gi,
+  /iyr:(201[0-9]|2020)/gi,
+  /eyr:(202[0-9]|2030)/gi,
+  /hgt:(1[5-8][0-9]|19[0-3])cm/gi,
+  /hgt:(59|6[0-9]|7[0-6])in/gi,
+  /hcl:\#[0-9a-f]{6}/gi,
+  /ecl:(amb|blu|brn|gry|grn|hzl|oth)/gi,
+  /pid:[0-9]{9}/gi,
+];
 let counter = 0;
 const passports = input.split("\n\n");
 
 passports.forEach((passport) => {
   let howManyPass = 0;
-  details.forEach((detail) => {
-    let regex = RegExp(detail, "gi");
+  details.forEach((regex) => {
     if (passport.match(regex)) {
       howManyPass++;
     }
