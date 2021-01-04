@@ -984,4 +984,27 @@ const seatsById = seats.map((seat) => {
   return row * 8 + col;
 });
 
-console.log(Math.max(...seatsById));
+// console.log(Math.max(...seatsById)); --- first part
+
+let hasSwapped = true;
+const bSort = (arr) => {
+  while (hasSwapped) {
+    hasSwapped = false;
+    arr.forEach((n, i) => {
+      if (n > arr[i + 1]) {
+        [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
+        hasSwapped = true;
+      }
+    });
+  }
+  return arr;
+};
+
+bSort(seatsById);
+
+for (let i = 0; i < seatsById.length; i++) {
+  if (seatsById[i + 1] !== seatsById[i] + 1) {
+    console.log(seatsById[i] + 1);
+    break;
+  }
+}
