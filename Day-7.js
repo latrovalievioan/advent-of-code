@@ -603,7 +603,7 @@ vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
 faded blue bags contain no other bags.
 dotted black bags contain no other bags.`;
 
-const solve = (input) => {
+const solve = (input2) => {
   const rules = input.split(/\n/gi).map((rule) => rule.split("contain"));
   const objs = {};
   rules.forEach((rule) => {
@@ -625,9 +625,27 @@ const solve = (input) => {
       nodes.push(...children);
     }
   };
+  let check = false;
+  const traverseRec = (root) => {
+    if (root === "shinygold") {
+      check = true;
+      return;
+    }
+    let children = objs[root] || [];
+    for (child of children) {
+      traverseRec(child);
+    }
+    return;
+  };
 
   const arr = Object.keys(objs).filter((x) => x !== "shinygold");
-  arr.forEach(traverse);
+  arr.forEach((el) => {
+    check = false;
+    traverseRec(el);
+    if (check === true) {
+      counterShiny++;
+    }
+  });
   console.log(counterShiny);
 };
-solve(input);
+solve(input2);
