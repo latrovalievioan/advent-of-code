@@ -690,21 +690,23 @@ const solve2 = (input) => {
   const traverse = (root) => {
     const nodes = [root];
     while (nodes.length > 0) {
-      console.log(nodes);
       const currentNode = nodes.shift();
       if (currentNode === "noother") {
         return;
       }
       let children = objs[currentNode] || [];
-      nodes.push(...children);
-      counter++;
+      for (let i = 0; i < children.length; i++) {
+        if (children[i] !== "noother") {
+          nodes.push(children[i]);
+          counter++;
+        }
+      }
     }
   };
 
   traverse("shinygold");
 
-  console.log(counter - 1);
-  console.log(objs);
+  console.log(counter);
 };
 
 solve2(input);
