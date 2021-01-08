@@ -593,7 +593,7 @@ pale gold bags contain 2 mirrored olive bags, 2 drab violet bags.
 wavy teal bags contain 1 dark maroon bag, 5 muted chartreuse bags, 1 shiny black bag, 3 dotted aqua bags.
 bright fuchsia bags contain 1 muted cyan bag.`;
 
-const input2 = `light red bags contain 1 bright white bag, 2 muted yellow bags.
+const input2 = `light red bags contain 1 bright white bag, 
 dark orange bags contain 3 bright white bags, 4 muted yellow bags.
 bright white bags contain 1 shiny gold bag.
 muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.
@@ -603,7 +603,19 @@ vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
 faded blue bags contain no other bags.
 dotted black bags contain no other bags.`;
 
-const solve = (input2) => {
+const input3 = `shiny gold bags contain 2 dark red bags.
+dark red bags contain 2 dark orange bags.
+dark orange bags contain 2 dark yellow bags.
+dark yellow bags contain 2 dark green bags.
+dark green bags contain 2 dark blue bags.
+dark blue bags contain 2 dark violet bags.
+dark violet bags contain no other bags.`;
+
+const input4 = `dark orange bags contain 3 dark chartreuse bags.
+striped fuchsia bags contain 5 striped lavender bags.
+dull gray bags contain 4 muted cyan bags, 3 light maroon bags.`;
+
+const solve = (input) => {
   const rules = input.split(/\n/gi).map((rule) => rule.split("contain"));
   const objs = {};
   rules.forEach((rule) => {
@@ -648,4 +660,51 @@ const solve = (input2) => {
   });
   console.log(counterShiny);
 };
-solve(input2);
+
+const solve2 = (input) => {
+  const rules = input.split(/\n/gi).map((rule) => rule.split("contain"));
+  const objs = {};
+  rules.forEach((rule) => {
+    objs[rule[0].replace("bags", "").replace(/\s*/g, "")] = rule[1]
+      .replace(/[^a-z0-9]/g, "")
+      .split(/bags?/)
+      .filter((x) => x);
+  });
+
+  for (let obj in objs) {
+    let newArr = [];
+    objs[obj].forEach((color) => {
+      if (Number(color[0])) {
+        for (let i = 0; i < Number(color[0]); i++) {
+          newArr.push(color.substring(1));
+        }
+      } else {
+        newArr.push(color);
+      }
+      objs[obj] = newArr;
+    });
+  }
+
+  let counter = 0;
+
+  const traverse = (root) => {
+    const nodes = [root];
+    while (nodes.length > 0) {
+      console.log(nodes);
+      const currentNode = nodes.shift();
+      if (currentNode === "noother") {
+        return;
+      }
+      let children = objs[currentNode] || [];
+      nodes.push(...children);
+      counter++;
+    }
+  };
+
+  traverse("shinygold");
+
+  console.log(counter - 1);
+  console.log(objs);
+};
+
+solve2(input);
