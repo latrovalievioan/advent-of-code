@@ -638,7 +638,9 @@ jmp +1
 acc +28
 jmp +1`;
 
-const solve = (input) => {
+let accArray = [];
+
+const getInstructions = (input) => {
   const instructions = input.split("\n").map((instruction) => {
     instruction = [
       instruction.split(" ")[0],
@@ -646,9 +648,13 @@ const solve = (input) => {
     ];
     return instruction;
   });
-  console.log(instructions);
+  return instructions;
+};
 
-  const dict = {};
+const solve = (instructions) => {
+  // console.log(instructions);
+
+  let dict = {};
 
   let acc = 0;
   for (let i = 0; i < instructions.length; i++) {
@@ -659,7 +665,21 @@ const solve = (input) => {
       else if (currentInstruction[0] === "jmp") i += currentInstruction[1] - 1;
     } else break;
   }
-  console.log(acc);
+  accArray.push(acc);
+  return instructions;
 };
 
-solve(input);
+let x = getInstructions(input);
+
+// solve(x);
+
+for (let i = 0; i < x.length; i++) {
+  let newArr = x;
+  if (newArr[i][0] === "jmp") newArr[i][0] = "nop";
+  else if (newArr[i][0] === "nop") newArr[i][0] = "jmp";
+  solve(newArr);
+  if (newArr[i][0] === "jmp") newArr[i][0] = "nop";
+  else if (newArr[i][0] === "nop") newArr[i][0] = "jmp";
+}
+
+console.log(Math.max(...accArray));

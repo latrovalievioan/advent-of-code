@@ -709,4 +709,4 @@ const solve2 = (input) => {
   console.log(counter);
 };
 
-solve2(input);
+solve2(input2);
