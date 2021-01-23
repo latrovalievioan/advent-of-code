@@ -217,5 +217,17 @@ for (let i: number = 0; i < numsArr.length - 1; i++){
 }
 } 
 
-console.log(solve(day1Input))
+const solvePt2 = (input:string):number => {
+    const numsArr: Array<number> = input.split("\n").map(string => (parseInt(string)))
+    for (let i: number = 0; i < numsArr.length - 2; i++){
+        for (let j: number = i + 1; j < numsArr.length - 1; j++){
+            for (let x: number = j + 1; x < numsArr.length; x++) {
+                if(numsArr[j] + numsArr[i] + numsArr[x] === 2020){
+                    return numsArr[j] * numsArr[i] * numsArr[x]
+                }
+            }
+        }
+    }
+}
 
+console.log(solvePt2(day1Input))
