@@ -999,7 +999,7 @@ const input = `4
 45967078295005
 43905084442604`;
 
-const testInput2 = `35
+const input2 = `35
 20
 15
 25
@@ -1025,6 +1025,28 @@ const arrNums = (input) =>
     return Number(n);
   });
 
+const findSum = (arr) => {
+  const n1 = Math.max(...arr);
+  const n2 = Math.min(...arr);
+  return n1 + n2;
+};
+
+const solve2 = (number, arr, startIndex) => {
+  let setLength = 2;
+  let sameOrBigger = false;
+  let sum = 0;
+  while (!sameOrBigger) {
+    const set = arr.slice(startIndex, startIndex + setLength);
+    sum = set.reduce((acc, current) => acc + current);
+    if (sum >= number) sameOrBigger = true;
+    setLength++;
+  }
+  if (sum === number) {
+    const set = arr.slice(startIndex, startIndex + setLength - 1);
+    return findSum(set);
+  } else return solve2(number, arr, startIndex + 1);
+};
+
 const solve = (input, preambleCount, startIndex) => {
   const arr = arrNums(input);
   const preambleArr = arr.slice(startIndex, startIndex + preambleCount);
@@ -1035,7 +1057,7 @@ const solve = (input, preambleCount, startIndex) => {
     if (preambleArr.some((num) => num === numberToComplete && num !== n))
       isValid = true;
   });
-  if (!isValid) return numToCheck;
+  if (!isValid) return solve2(numToCheck, arr, 0);
   else return solve(input, preambleCount, startIndex + 1);
 };
 
