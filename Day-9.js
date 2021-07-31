@@ -1,24 +1,3 @@
-const testInput = `35
-20
-15
-25
-47
-40
-62
-55
-65
-95
-102
-117
-150
-182
-127
-219
-299
-277
-309
-576`;
-
 const input = `4
 10
 17
@@ -1020,38 +999,44 @@ const input = `4
 45967078295005
 43905084442604`;
 
-const testInput2 = `1
-2
-3
-4
-5
-10
-16
-17
-18
-19
-38
-`;
+const testInput2 = `35
+20
+15
+25
+47
+40
+62
+55
+65
+95
+102
+117
+150
+182
+127
+219
+299
+277
+309
+576`;
 
-const solve = (input, preamble) => {
-  const isSum = (num, arr) => {
-    for (let i = 0; i < arr.length; i++) {
-      for (let j = 0; j < arr.length; j++) {
-        if (arr[i] + arr[j] === num && arr[i] !== arr[j]) {
-          return true;
-        }
-      }
-    }
-    return false;
-  };
-  const nums = input.split("\n").map(Number);
-  for (let i = preamble + 1; i < nums.length; i++) {
-    let arr = nums.slice(i - preamble - 1, i - 1);
-    let x = isSum(nums[i], arr);
-    if (!x) {
-      console.log(nums[i]);
-    }
-  }
+const arrNums = (input) =>
+  input.split('\n').map((n) => {
+    return Number(n);
+  });
+
+const solve = (input, preambleCount, startIndex) => {
+  const arr = arrNums(input);
+  const preambleArr = arr.slice(startIndex, startIndex + preambleCount);
+  const numToCheck = arr[preambleCount + startIndex];
+  let isValid = false;
+  preambleArr.forEach((n) => {
+    const numberToComplete = numToCheck - n;
+    if (preambleArr.some((num) => num === numberToComplete && num !== n))
+      isValid = true;
+  });
+  if (!isValid) return numToCheck;
+  else return solve(input, preambleCount, startIndex + 1);
 };
 
-solve(input, 24);
+console.log(solve(input, 25, 0));
