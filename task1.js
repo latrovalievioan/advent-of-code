@@ -20,3 +20,11 @@ const solvePart1 = (input) => {
 console.log(solvePart1(input))
 
 
+const solvePart2 = (input) => {
+  const aggregated = input.map((n,i,a) => n + a[i+1] + a[i+2]) 
+  return solvePart1(aggregated)
+}
+
+console.log(solvePart2(input))
+
+
