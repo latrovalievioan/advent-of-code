@@ -30,5 +30,19 @@ const solvePart1 = (input) => {
 }
 
 
-
 console.log(solvePart1(input))
+
+
+
+const solvePart2 = (input) => {
+  let depth = 0
+  let h = 0
+  let aim = 0
+  input.forEach((x) => {
+    eval(x.replace("down", "aim +=").replace("up", "aim -=").replace("forward","h +="))
+    if(x.match("forward")) eval(x.replace("forward", "depth += aim *"))
+  })
+  return depth * h 
+}
+
+console.log(solvePart2(input))
