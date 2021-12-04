@@ -23,3 +23,36 @@ const solvePart1 = (input) => {
 }
 
 console.log(solvePart1(input))
+
+const solvePart2 = (input) => {
+  const getMostCommon = (column) => (Number(column.match(/1/g).length) >= column.match(/0/g).length)
+  const getLeastCommon = (column) => (Number(column.match(/1/g).length) < column.match(/0/g).length)
+
+  const getRating = (input, j, fn) => {
+    if(input.length <= 1) {
+      return input
+    }
+    const transposedInput = Array(input[0].length).fill('')
+      .map(
+        (e,i) => (input.map(e2 => (e2[i]))).join('')
+      )
+    const column = transposedInput[j]
+    const mostCommon = fn(column)
+    const fInput = input.filter((n) => {
+      return Number(n[j]) === Number(mostCommon)
+    })
+    return getRating(fInput, j+ 1, fn)
+  }
+  const ogRating = getRating(input, 0, getMostCommon).join('')
+  const co2Rating = getRating(input, 0, getLeastCommon).join('')
+  
+  return parseInt(ogRating, 2) * parseInt(co2Rating, 2)
+}
+
+console.log(solvePart2(input))
+
+
+
+
+
+
