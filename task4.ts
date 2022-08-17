@@ -109,12 +109,60 @@ const getWinnerTableAndNum = (input: string): WinnerTableAndNum => {
   }
 };
 
+const getLastWinnerTableAndNum = (input: string): WinnerTableAndNum => {
+  const normalizedInput = _splitInput(input);
+  const { nums, tables } = normalizedInput;
+  let winnerNum: number;
+  let lastWinnerTable: Array<number[]>;
+  const winnerTablesSet: Set<number> = new Set()
+
+  for (let numsI = 0; numsI < nums.length; numsI++) {
+    const currentNum = nums[numsI];
+
+    for (let tablesI = 0; tablesI < tables.length; tablesI++) {
+      const currTable = tables[tablesI];
+
+      for (let rowI = 0; rowI < currTable.length; rowI++) {
+        const currRow = currTable[rowI];
+
+        for (let colI = 0; colI < currRow.length; colI++) {
+          const currCell = currRow[colI];
+
+          if (currCell === currentNum) {
+            currRow[colI] = -1
+            winnerNum = currentNum
+          };
+        }
+      }
+    }
+
+    for (let j = 0; j < tables.length; j++) {
+      const currTable = tables[j];
+      if (checkTable(currTable) && !winnerTablesSet.has(j)) {
+        lastWinnerTable = currTable;
+        winnerNum = currentNum;
+        winnerTablesSet.add(j)
+        if(tables.length === winnerTablesSet.size){
+          return {
+            table: lastWinnerTable,
+            num: currentNum,
+          }
+        }
+      };
+    }
+  }
+  return {
+    table: lastWinnerTable,
+    num: winnerNum,
+  }
+};
+
 const solveIt = (input: string): number => {
-  const {table, num} = getWinnerTableAndNum(input);
+  const {table, num} = getLastWinnerTableAndNum(input);
   return table
     .flatMap((x) => x)
     .filter((x) => x !== -1)
-    .reduce((a, c) => a + c) * num
+    .reduce((a, c) => a + c, 0) * num
 };
 
-console.log(solveIt(data));
+console.log(solveIt(testInput));
