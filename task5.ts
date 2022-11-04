@@ -71,7 +71,7 @@ const getMatrixSize = (parsedInput: ParsedInput): MatrixSize => {
 type Matrix = Array<Array<0 | number>>;
 
 const drawMatrix = (matrixSize: MatrixSize): Matrix => {
-  const { rows, cols } = matrixSize;
+  const { rows, cols } = {rows: 9, cols: 9};
   let matrix = [];
   for (let i = 0; i <= rows; i++) {
     matrix[i] = [];
@@ -103,6 +103,8 @@ const drawLines = (matrix: Matrix, parsedInput: ParsedInput): Matrix => {
     }
   }
 
+  prettyPrint(linesMatrix);
+
   return linesMatrix
 };
 
@@ -114,6 +116,6 @@ const getPoints = (matrix: Matrix): number => {
   }, 0)
 }
 
-const parsedInput = parseInput(_data_);
+const parsedInput = parseInput(tInput2);
 
 console.log(getPoints(drawLines(drawMatrix(getMatrixSize(parsedInput)), parsedInput)));
