@@ -52,8 +52,47 @@ func solve(lines []string) int {
 	return sum
 }
 
+func formatLine(l string) string {
+	conversions := map[string]string{
+		"one":   "one1one",
+		"two":   "two2two",
+		"three": "three3three",
+		"four":  "four4four",
+		"five":  "five5five",
+		"six":   "six6six",
+		"seven": "seven7seven",
+		"eight": "eight8eight",
+		"nine":  "nine9nine",
+	}
+
+	for k, v := range conversions {
+		l = strings.Replace(l, k, v, -1)
+	}
+
+	return l
+}
+
+func formatLines(lines []string) []string {
+	res := []string{}
+	for _, v := range lines {
+		if v == "" {
+			break
+		}
+
+		res = append(res, formatLine(v))
+	}
+
+	return res
+}
+
+func solve2(lines []string) int {
+	formatedLines := formatLines(lines)
+	return solve(formatedLines)
+}
+
 func main() {
 	input := readFileAsString("input")
 	lines := strings.Split(input, "\n")
 	fmt.Println(solve(lines))
+	fmt.Println(solve2(lines))
 }
