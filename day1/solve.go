@@ -1,17 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
+	"unicode"
 )
-
-func main() {
-	input := readFileAsString("input")
-	lines := strings.Split(input, "\n")
-
-	fmt.Println(solve(lines))
-}
 
 func readFileAsString(path string) string {
 	b, err := os.ReadFile(path)
@@ -21,50 +17,43 @@ func readFileAsString(path string) string {
 	return string(b)
 }
 
+func getLine(s string) string {
+	result := ""
+
+	for i := 0; i < len(s); i++ {
+		currentAsRune := bytes.Runes([]byte{s[i]})[0]
+		if unicode.IsNumber(currentAsRune) {
+			result += string(currentAsRune)
+			break
+		}
+	}
+
+	for i := len(s) - 1; i >= 0; i-- {
+		currentAsRune := bytes.Runes([]byte{s[i]})[0]
+		if unicode.IsNumber(currentAsRune) {
+			result += string(currentAsRune)
+			break
+		}
+	}
+
+	return result
+}
+
 func solve(lines []string) int {
 	sum := 0
-	for i := 0; i < len(lines)-1; i++ {
-		sum += calcLine(lines[i])
-	}
 
-	return sum
-}
-
-func calcLine(s string) int {
-	leftP, rightP := 0, len(s)-1
-	sum := 0
-	updateLeft := true
-	updateRight := true
-
-	for updateLeft || updateRight {
-		leftB, rightB := s[leftP], s[rightP]
-
-		if isByteNumber(leftB) && updateLeft {
-			sum += (10 * byteToInt(leftB))
-			updateLeft = false
-		}
-
-		if isByteNumber(rightB) && updateRight {
-			sum += byteToInt(rightB)
-			updateRight = false
-		}
-
-		if updateLeft {
-			leftP++
-		}
-
-		if updateRight {
-			rightP--
+	for _, v := range lines {
+		conv, err := strconv.Atoi(getLine(v))
+		if err == nil {
+			sum += conv
 		}
 	}
 
 	return sum
 }
 
-func isByteNumber(b byte) bool {
-	return b >= 48 && b <= 57
-}
-
-func byteToInt(b byte) int {
-	return int(b - 48)
+func main() {
+	input := readFileAsString("input")
+	lines := strings.Split(input, "\n")
+	fmt.Println(solve(lines))
 }
