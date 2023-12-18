@@ -15,12 +15,16 @@ func readFileAsString(path string) string {
 	return string(b)
 }
 
-func calcLine(l string) int {
+type lineValues struct {
+	gameId     int
+	isPossible bool
+	power      int
+}
+
+func calcLine(l string) lineValues {
 	split := strings.Split(l, ":")
 	gameId, _ := strconv.Atoi(strings.Split(split[0], " ")[1])
-
 	maxRed, maxBlue, maxGreen := 0, 0, 0
-
 	sets := strings.Split(split[1], ";")
 
 	for _, v := range sets {
@@ -46,11 +50,11 @@ func calcLine(l string) int {
 		}
 	}
 
-	if maxRed > 12 || maxGreen > 13 || maxBlue > 14 {
-		return 0
+	return lineValues{
+		gameId,
+		maxRed <= 12 && maxGreen <= 13 && maxBlue <= 14,
+		maxRed * maxGreen * maxBlue,
 	}
-
-	return gameId
 }
 
 func solve(lines []string) int {
@@ -61,7 +65,25 @@ func solve(lines []string) int {
 			break
 		}
 
-		sum += calcLine(v)
+		lineValues := calcLine(v)
+
+		if lineValues.isPossible {
+			sum += lineValues.gameId
+		}
+	}
+
+	return sum
+}
+
+func solve2(lines []string) int {
+	sum := 0
+
+	for _, v := range lines {
+		if v == "" {
+			break
+		}
+
+		sum += calcLine(v).power
 	}
 
 	return sum
@@ -69,7 +91,9 @@ func solve(lines []string) int {
 
 func main() {
 	input := readFileAsString("input")
+	// input := readFileAsString("test_input")
 	lines := strings.Split(input, "\n")
 
 	fmt.Println(solve(lines))
+	fmt.Println(solve2(lines))
 }
