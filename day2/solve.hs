@@ -7,25 +7,19 @@ main :: IO ()
 main = do
   input <- filter (/= "") . splitOn "\n" <$> readFile "input"
 
-  print(calcSet "3 blue, 4 red")
-
-  print $ calcLine(head input)
-
-  solve input
+  print $ solve input
 
   where 
-    solve :: [String] -> IO()
-    solve lines = do 
-      let x = foldl' step 0 lines
-      print x
-      
+    solve :: [String] -> (Int, Int)
+    solve = foldl' step (0, 0)
       where
-        step :: Int -> String -> Int
-        step acc line
-          | r <= 12 && g <= 13 && b <= 14 = acc + id
-          | otherwise =  acc
+        step :: (Int, Int) -> String -> (Int, Int)
+        step (idSum, powerSum) line
+          | r <= 12 && g <= 13 && b <= 14 = (idSum + id, powerSum + power)
+          | otherwise = (idSum, powerSum + power)
           where
             (id, (r,g,b)) = calcLine line
+            power = r * g * b
 
     calcLine :: String -> (Int, RGB)
     calcLine l = (read id :: Int, foldl' step (0, 0 ,0) gameSets)
