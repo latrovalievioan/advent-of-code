@@ -135,9 +135,32 @@ func solve(matrix []string) int {
 	return sum
 }
 
+func solve2(matrix []string) int {
+	sum := 0
+	for rI, r := range matrix {
+		r := []byte(r)
+		for cI, c := range r {
+			if c != '*' {
+				continue
+			}
+
+			adjecentNums := findAdjecentNums(matrix, rI, cI)
+
+			if len(adjecentNums) != 2 {
+				continue
+			}
+
+			sum += adjecentNums[0] * adjecentNums[1]
+		}
+	}
+
+	return sum
+}
+
 func main() {
 	input := readFileAsString("./input")
 	lines := strings.Split(input, "\n")
 
 	fmt.Println(solve(lines))
+	fmt.Println(solve2(lines))
 }
