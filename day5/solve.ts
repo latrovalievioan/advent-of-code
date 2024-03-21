@@ -1,6 +1,6 @@
 import * as fs from "fs";
 
-const input = fs
+const { seeds, ...ranges } = fs
     .readFileSync("./input", "utf-8")
     .split("\n\n")
     .map((x) => x.split("\n"))
@@ -33,32 +33,25 @@ const input = fs
     [key: string]: number[][];
 };
 
-const rangesToMap = (ranges: number[][]) => {
-    const map = new Map<string, number>();
+const translate = (val: number, ranges: number[][]) => {
+    for (let i = 0; i < ranges.length; i++) {
+        const [minIn, minOut, range] = ranges[i];
+        const maxOut = minOut + range;
 
-    ranges.forEach((r) => {
-        const [output, input, length] = r;
-
-        for (let i = 0; i < length; i++) {
-            map.set(`${input + i}`, output + i);
+        if (val >= minOut && val < maxOut) {
+            return minIn + val - minOut;
         }
-    });
+    }
 
-    return map;
+    return val;
 };
-
-const translate = (val: number, map: Map<string, number>) =>
-    map.has(`${val}`) ? map.get(`${val}`) : val;
-
-const { seeds, ...ranges } = input;
 
 const part1 = Math.min(
     ...seeds.map((s) => {
-        let val = s;
         for (let k in ranges) {
-            val = translate(val, rangesToMap(ranges[k]));
+            s = translate(s, ranges[k]);
         }
-        return val;
+        return s;
     }),
 );
 
