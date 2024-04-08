@@ -1,20 +1,9 @@
-defmodule Part1 do
-  @maxes %{"red" => 12, "green" => 13, "blue" => 14}
-
-  def solve(path) do
+defmodule Utils do
+  def parse_input(path) do
     File.stream!(path)
     |> Enum.map(fn input ->
       input
       |> parse_line()
-    end)
-    |> Enum.with_index()
-    |> dbg
-    |> Enum.reduce(0, fn {map, i}, acc ->
-      if map["red"] <= @maxes["red"] && map["green"] <= @maxes["green"] && map["blue"] <= @maxes["blue"] do
-        acc + i + 1
-      else
-        acc
-      end
     end)
   end
 
@@ -52,4 +41,29 @@ defmodule Part1 do
   end
 end
 
-IO.puts(Part1.solve("./input"))
+defmodule Solve do
+  @maxes %{"red" => 12, "green" => 13, "blue" => 14}
+
+  def part_1(path) do
+    Utils.parse_input(path)
+    |> Enum.with_index()
+    |> Enum.reduce(0, fn {map, i}, acc ->
+      if map["red"] <= @maxes["red"] && map["green"] <= @maxes["green"] &&
+           map["blue"] <= @maxes["blue"] do
+        acc + i + 1
+      else
+        acc
+      end
+    end)
+  end
+
+  def part_2(path) do
+    Utils.parse_input(path)
+    |> Enum.reduce(0, fn %{"red" => red, "green" => green, "blue" => blue}, acc -> 
+      acc + red * green * blue
+    end)
+  end
+end
+
+IO.puts(Solve.part_1("./input"))
+IO.puts(Solve.part_2("./input"))
