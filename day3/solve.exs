@@ -63,10 +63,8 @@ defmodule Utils do
     initial = Map.get(map, {r + d_r, c + d_c}, "")
 
     if is_symbol(initial) do
-      "0"
+      ""
     else
-      initial
-
       left = walk_left("", {r + d_r, c + d_c - 1}, map)
 
       right = walk_right("", {r + d_r, c + d_c + 1}, map)
@@ -81,17 +79,47 @@ defmodule Utils do
       delta
       |> string_from_delta(start, map)
     end)
+    |> Enum.filter(fn x -> x !== "" end)
     |> MapSet.new()
     |> Enum.reduce(0, fn curr, acc ->
       String.to_integer(curr) + acc
     end)
   end
+
+  def is_gear_symbol(ch) do
+    ch === "*"
+  end
+
+  def gear_symbols_from_map(map) do
+    map
+    |> Map.filter(fn {_, v} ->
+      is_gear_symbol(v)
+    end)
+  end
+
+  def gear_neighbours(vec, map) do
+    neighbour_deltas()
+    |> Enum.map(fn dir ->
+      dir
+      |> Enum.map(fn delta ->
+        delta
+        |> string_from_delta(vec, map)
+      end)
+      |> Enum.filter(fn x -> x !== "" end)
+      |> Enum.map(fn x ->
+        String.to_integer(x)
+      end)
+      |> MapSet.new()
+      |> MapSet.to_list()
+    end)
+    |> Enum.flat_map(fn x -> x end)
+  end
 end
 
-defmodule Part_1 do
+defmodule Solve do
   @file_path "./input"
 
-  def solve do
+  def part_1 do
     input_map = Utils.input_to_map(@file_path)
 
     input_map
@@ -104,6 +132,22 @@ defmodule Part_1 do
          end))
     end)
   end
+
+  def part_2 do
+    input_map = Utils.input_to_map(@file_path)
+
+    input_map
+    |> Utils.gear_symbols_from_map()
+    |> Enum.map(fn {vec, _} ->
+      vec
+      |> Utils.gear_neighbours(input_map)
+    end)
+    |> Enum.filter(fn x -> Enum.count(x) === 2 end)
+    |> Enum.reduce(0, fn curr, acc ->
+      acc + (curr |> Enum.reduce(1, fn num, acc2 -> num * acc2 end))
+    end)
+  end
 end
 
-Part_1.solve() |> dbg
+Solve.part_1() |> dbg
+Solve.part_2() |> dbg
