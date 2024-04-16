@@ -57,7 +57,7 @@ const part1 = Math.min(
     }),
 );
 
-console.log(part1);
+// console.log(part1);
 
 const mapTo = (out: number, lowMap: number, lowSeed: number) =>
     out - lowMap + lowSeed;

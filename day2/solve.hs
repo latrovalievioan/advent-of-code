@@ -51,6 +51,3 @@ main = do
 
           where
             [v, c] = splitOn " " curr
-
-
-
