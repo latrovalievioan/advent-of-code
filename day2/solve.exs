@@ -59,7 +59,7 @@ defmodule Solve do
 
   def part_2(path) do
     Utils.parse_input(path)
-    |> Enum.reduce(0, fn %{"red" => red, "green" => green, "blue" => blue}, acc -> 
+    |> Enum.reduce(0, fn %{"red" => red, "green" => green, "blue" => blue}, acc ->
       acc + red * green * blue
     end)
   end
