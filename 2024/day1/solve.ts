@@ -27,3 +27,25 @@ const part1 = () => {
 };
 
 console.log(part1());
+
+const part2 = () => {
+    const xs = []
+    const ys = []
+
+    const input = fs.readFileSync("./input").toString().replace(/\s+/g, ",").split(',');
+
+    for(let i = 0; i < input.length - 1; i++) {
+        if(i % 2 === 0) {
+            xs.push(Number(input[i]))
+        }else{
+            ys.push(Number(input[i]))
+        }
+    }
+        
+
+    return xs.reduce((acc, curr) => {
+        return acc + (ys.filter(x => x === curr).length * curr)
+    }, 0)
+};
+
+console.log(part2());
