@@ -111,4 +111,63 @@ const part1 = (matrix: string[][]) => {
     return move(matrix, i, j, dir);
 };
 
+const move2 = (
+    matrix: string[][],
+    i: number,
+    j: number,
+    dir: keyof typeof DIRECTIONS,
+    depth: number = 0
+) => {
+    if(depth > 100000) {
+        return true
+    }
+
+    let nextI = i + MOVES[dir].i;
+    let nextJ = j + MOVES[dir].j;
+
+    if (!isInBounds(matrix, nextI, nextJ)) {
+        return false
+    }
+
+    while(isObstacle(matrix, nextI, nextJ)) {
+        dir = changeDir(dir);
+        nextI = i + MOVES[dir].i;
+        nextJ = j + MOVES[dir].j;
+    }
+
+    if (!isInBounds(matrix, nextI, nextJ)) {
+        return false;
+    }
+
+    return move2(matrix, nextI, nextJ, dir, depth + 1);
+};
+
+const part2 = (matrix: string[][]) => {
+    let count = 0
+    for(let i = 0; i < matrix.length; i++) {
+        for(let j = 0; j < matrix[i].length; j++) {
+            const startingCoordinates = findStartingCoordinates(matrix);
+
+            if(startingCoordinates.i === i && startingCoordinates.j === j) continue
+
+            if(matrix[i][j] === "#") continue
+
+            const copyMatrix = [...matrix]
+
+            const temp = copyMatrix[i][j]
+            copyMatrix[i][j] = "#"
+
+            if(move2(copyMatrix, startingCoordinates.i, startingCoordinates.j, startingCoordinates.dir)) {
+                count++
+                console.log(i,j)
+            };
+
+            copyMatrix[i][j] = temp
+        }
+    }
+
+    return count
+}
+
 console.log(part1(input));
+console.log(part2(input));
