@@ -51,7 +51,7 @@ type FindAntiLocationArgs = {
 
 const findAntiLocation = ({
     nextAntenaI,
-    nextAntenaJ,
+            nextAntenaJ,
     currentAntenaI,
     currentAntenaJ,
 }: FindAntiLocationArgs) => {
