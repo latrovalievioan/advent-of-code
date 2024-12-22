@@ -37,44 +37,61 @@ const input = fs
                 return { x: locations[0], y: locations[1] };
             });
 
-        return {button1: machines[0], button2: machines[1], location: machines[2]}
+        return {
+            button1: machines[0],
+            button2: machines[1],
+            location: machines[2],
+        };
     });
 
-const solveMachine = (machine: (typeof input[number])) => {
+const solveMachine = (machine: (typeof input)[number]) => {
     const M = [
-    [machine.button1.dX, machine.button2.dX],
-    [machine.button1.dY, machine.button2.dY]
-    ]
+        [machine.button1.dX, machine.button2.dX],
+        [machine.button1.dY, machine.button2.dY],
+    ];
 
-    const determinantM = (M[0][0] * M[1][1]) - (M[0][1] * M[1][0])
+    const determinantM = M[0][0] * M[1][1] - M[0][1] * M[1][0];
 
     const button1M = [
         [machine.location.x, machine.button2.dX],
-        [machine.location.y, machine.button2.dY]
-    ]
+        [machine.location.y, machine.button2.dY],
+    ];
 
-    const determinantButton1M = (button1M[0][0] * button1M[1][1]) - (button1M[0][1] * button1M[1][0])
+    const determinantButton1M =
+        button1M[0][0] * button1M[1][1] - button1M[0][1] * button1M[1][0];
 
     const button2M = [
         [machine.button1.dX, machine.location.x],
-        [machine.button1.dY, machine.location.y]
-    ]
+        [machine.button1.dY, machine.location.y],
+    ];
 
-    const determinantButton2M = (button2M[0][0] * button2M[1][1]) - (button2M[0][1] * button2M[1][0])
+    const determinantButton2M =
+        button2M[0][0] * button2M[1][1] - button2M[0][1] * button2M[1][0];
 
-    const buttonAPresses = determinantButton1M / determinantM
+    const buttonAPresses = determinantButton1M / determinantM;
 
-    const buttonBPresses = determinantButton2M / determinantM
+    const buttonBPresses = determinantButton2M / determinantM;
 
-    if(buttonAPresses > 100 || buttonBPresses > 100) return 0
-    if(buttonAPresses < 0 || buttonBPresses < 0) return 0
-    if(!Number.isInteger(buttonAPresses) || !Number.isInteger(buttonBPresses)) return 0
+    // if (buttonAPresses > 100 || buttonBPresses > 100) return 0;
+    if (buttonAPresses < 0 || buttonBPresses < 0) return 0;
+    if (!Number.isInteger(buttonAPresses) || !Number.isInteger(buttonBPresses))
+        return 0;
 
-    console.log(buttonAPresses, buttonBPresses)
+    console.log(buttonAPresses, buttonBPresses);
 
-    return Math.floor(buttonAPresses) * 3 + Math.floor(buttonBPresses)
-}
+    return Math.floor(buttonAPresses) * 3 + Math.floor(buttonBPresses);
+};
 
-const p1 = input.reduce((acc, machine) => acc += solveMachine(machine),0)
+const p1 = input.reduce((acc, machine) => (acc += solveMachine(machine)), 0);
 
-console.log(p1)
+const p2 = input.map((m) => ({
+    ...m,
+    location: {
+        x: m.location.x + 10000000000000,
+        y: m.location.y + 10000000000000,
+    },
+})).reduce((acc, machine) => (acc += solveMachine(machine)), 0);
+;
+
+console.log(p1);
+console.log(p2);
