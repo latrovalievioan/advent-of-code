@@ -42,52 +42,135 @@ const getVisitableNeighbours = (matrix: string[][], i: number, j: number) =>
         .map((k: keyof typeof DELTAS) => ({
             i: i + DELTAS[k].i,
             j: j + DELTAS[k].j,
-            parentI: i,
-            parendJ: j,
+            k,
         }))
         .filter((n) => matrix[n.i][n.j] !== "#");
 
-const bfs = (matrix: string[][], startI: number, startJ: number) => {
-    const q = getVisitableNeighbours(matrix, startI, startJ);
-    const visited = new Map<string, string>();
-    visited.set(`${startI},${startJ}`, "");
+// const findAllPaths = (matrix: string[][], startI: number, startJ: number) => {
+//     const allPaths = [];
+//
+//     const dfs = (i: number, j: number, path: string[]) => {
+//         console.log('yey')
+//         path.push(`${i},${j}`);
+//
+//         if (matrix[i][j] === "E") {
+//             allPaths.push([...path]);
+//         } else {
+//             const neighbours = getVisitableNeighbours(matrix, i, j).filter(
+//                 (n) => !path.includes(`${n.i},${n.j}`),
+//             );
+//             neighbours.forEach((n) => dfs(n.i, n.j, path));
+//         }
+//
+//         path.pop();
+//     };
+//
+//     dfs(startI, startJ, []);
+//
+//     return allPaths;
+// };
+//
+// const bfs = (matrix: string[][], i: number, j: number) => {
+//     const parents = new Map<string, string>();
+//     const q = []
+//
+//     const neighbours = getVisitableNeighbours(matrix, i, j).filter(
+//         (n) => !parents.has(`${n.i},${n.j}`),
+//     );
+//
+//     neighbours.forEach(n => {
+//         q.push(n)
+//         parents.set(`${n.i},${n.j}`, `${i},${j}`)
+//     })
+//
+//     parents.set(`${i},${j}`, "nah");
+//
+//     while (q.length) {
+//         const current = q.shift();
+//
+//         if (matrix[current.i][current.j] === "E") {
+//             const path = [];
+//             let node = `${current.i},${current.j}`;
+//             while (parents.get(node) !== "nah") {
+//                 const [II,JJ] = node.split(',')
+//                 matrixCopy[II][JJ] = 'X'
+//                 path.push(node);
+//                 node = parents.get(node);
+//             }
+//
+//             path.push(node)
+//
+//             return path.reverse();
+//         }
+//
+//         const neighbours = getVisitableNeighbours(
+//             matrix,
+//             current.i,
+//             current.j,
+//         ).filter((n) => !parents.has(`${n.i},${n.j}`));
+//
+//         neighbours.forEach(n => {
+//             q.push(n)
+//             parents.set(`${n.i},${n.j}`, `${current.i},${current.j}`)
+//         })
+//     }
+// };
+const bfs = (matrix: string[][], i: number, j: number) => {
+    const q = []
+    const visited = new Set<string>()
+};
 
-    while (q.length) {
-        const current = q.pop();
-        visited.set(
-            `${current.i},${current.j}`,
-            `${current.parentI},${current.parendJ}`,
-        );
+const calcPathValue = (path: string[]) => {
+    let dir = "R";
+    let sum = 0;
 
-        if (matrix[current.i][current.j] === "E") break;
+    for (let i = 1; i < path.length; i++) {
+        sum++;
 
-        const neighbours = getVisitableNeighbours(
-            matrix,
-            current.i,
-            current.j,
-        ).filter((n) => !visited.has(`${n.i},${n.j}`));
+        const [currI, currJ] = path[i].split(",");
 
-        q.unshift(...neighbours);
+        if (Number(currI) - 1 === Number(path[i - 1].split(",")[0])) {
+            const newDir = "U";
+            if (newDir !== dir) {
+                sum += 1000;
+                dir = newDir;
+            }
+        }
+
+        if (Number(currJ) + 1 === Number(path[i - 1].split(",")[1])) {
+            const newDir = "R";
+            if (newDir !== dir) {
+                sum += 1000;
+                dir = newDir;
+            }
+        }
+
+        if (Number(currI) + 1 === Number(path[i - 1].split(",")[0])) {
+            const newDir = "D";
+            if (newDir !== dir) {
+                sum += 1000;
+                dir = newDir;
+            }
+        }
+
+        if (Number(currJ) - 1 === Number(path[i - 1].split(",")[1])) {
+            const newDir = "L";
+            if (newDir !== dir) {
+                sum += 1000;
+                dir = newDir;
+            }
+        }
     }
 
-    const path: string[] = []
-
-    const endCoordinates = findCoordinatesOf(matrix, "E");
-
-    let nextKey = `${endCoordinates.i},${endCoordinates.j}`
-    
-    while(nextKey) {
-        path.push(nextKey)
-        nextKey = visited.get(nextKey)
-    }
-
-    return path
+    return sum;
 };
 
 const p1 = (matrix: string[][]) => {
     const startCoordinates = findCoordinatesOf(matrix, "S");
 
-    return bfs(matrix, startCoordinates.i, startCoordinates.j);
+    console.log(bfs(matrix, startCoordinates.i, startCoordinates.j))
+
+    // return calcPathValue(bfs(matrix, startCoordinates.i, startCoordinates.j));
 };
 
 console.log(p1(matrix));
