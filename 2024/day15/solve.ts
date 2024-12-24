@@ -1,6 +1,6 @@
 import * as fs from "fs";
 
-const input = fs.readFileSync("./test_input00", "utf-8").split("\n\n");
+const input = fs.readFileSync("./test_input", "utf-8").split("\n\n");
 
 const matrix = input[0].split("\n").map((l) => l.split(""));
 
@@ -129,13 +129,15 @@ const attemptMove = ({ matrix, dir, currentPosition }: AttemptMoveArgs) => {
             depthLeft++;
         }
 
-        let depth = Math.max(depthLeft, depthRight);
+        const minJ = currentPosition.j - depthLeft + 1;
+        const maxJ = currentPosition.j + depthRight;
 
-        const fromJ = currentPosition.j - depth;
-        const toJ = currentPosition.j + depth - 1;
+        for (let j = minJ; j <= maxJ; j++) {
+            if (matrix[currentPosition.i - depthLeft][j] === "#") return;
+        }
 
-        for (let j = fromJ; j <= toJ; j++) {
-            if (matrix[currentPosition.i - depth][j] === "#") return;
+        for (let j = minJ; j <= maxJ; j++) {
+            if (matrix[currentPosition.i - depthRight][j] === "#") return;
         }
     }
 
@@ -162,13 +164,14 @@ const attemptMove = ({ matrix, dir, currentPosition }: AttemptMoveArgs) => {
             depthLeft++;
         }
 
-        let depth = Math.max(depthLeft, depthRight);
+        const minJ = currentPosition.j - depthLeft;
+        const maxJ = currentPosition.j + depthRight - 1;
 
-        const fromJ = currentPosition.j - depth;
-        const toJ = currentPosition.j + depth - 1;
-
-        for (let j = fromJ; j <= toJ; j++) {
-            if (matrix[currentPosition.i - depth][j] === "#") return;
+        for (let j = minJ; j <= maxJ; j++) {
+            if (matrix[currentPosition.i - depthLeft][j] === "#") return;
+        }
+        for (let j = minJ; j <= maxJ; j++) {
+            if (matrix[currentPosition.i - depthRight][j] === "#") return;
         }
     }
 
@@ -191,13 +194,15 @@ const attemptMove = ({ matrix, dir, currentPosition }: AttemptMoveArgs) => {
             depthRight++;
         }
 
-        const depth = Math.max(depthRight,depthLeft)
+        const minJ = currentPosition.j - depthLeft + 1;
+        const maxJ = currentPosition.j + depthRight;
 
-        const fromJ = currentPosition.j - depth + 1;
-        const toJ = currentPosition.j + depth;
+        for (let j = minJ; j <= maxJ; j++) {
+            if (matrix[currentPosition.i + depthLeft][j] === "#") return;
+        }
 
-        for (let j = fromJ; j <= toJ; j++) {
-            if (matrix[currentPosition.i + depth][j] === "#") return;
+        for (let j = minJ; j <= maxJ; j++) {
+            if (matrix[currentPosition.i + depthRight][j] === "#") return;
         }
     }
 
@@ -220,16 +225,17 @@ const attemptMove = ({ matrix, dir, currentPosition }: AttemptMoveArgs) => {
             depthRight++;
         }
 
-        const depth = Math.max(depthRight,depthLeft)
-        console.log(depthLeft, depthRight)
-        console.log(depth)
+        const minJ = currentPosition.j - depthLeft
+        const maxJ = currentPosition.j + depthRight - 1
 
-        const fromJ = currentPosition.j - depth;
-        const toJ = currentPosition.j + depth - 1;
-
-        for (let j = fromJ; j <= toJ; j++) {
-            if (matrix[currentPosition.i + depth][j] === "#") return;
+        for(let j = minJ; j <= maxJ; j++) {
+            if(matrix[currentPosition.i + depthLeft][j] === '#') return
         }
+
+        for(let j = minJ; j <= maxJ; j++) {
+            if(matrix[currentPosition.i + depthRight][j] === '#') return
+        }
+
     }
 
     if (
@@ -398,19 +404,55 @@ const attemptMove = ({ matrix, dir, currentPosition }: AttemptMoveArgs) => {
 //     ["#", "[", "]", ".", ".", ".", ".", "#", "#"],
 //     ["#", "#", "#", "#", "#", "#", "#", "#", "#"],
 // ];
+// const testMatrix = [
+//     ["#", "#", "#", "#", "#", "#", "#", "#", "#"],
+//     ["#", "#", ".", ".", "@", ".", ".", "#", "#"],
+//     ["#", "#", ".", ".", "[", "]", ".", "#", "#"],
+//     ["#", "#", ".", "[", "]", "[", "]", "#", "#"],
+//     ["#", "#", "#", "#", ".", ".", "[", "]", "#"],
+//     ["#", "#", ".", ".", ".", ".", ".", ".", "#"],
+//     ["#", "#", "#", "#", "#", "#", "#", "#", "#"],
+// ];
+// const testMatrix = [
+//     ["#", "#", "#", "#", "#", "#", "#", "#", "#"],
+//     ["#", ".", ".", ".", ".", ".", ".", ".", "#"],
+//     ["#", ".", "#", "#", ".", ".", "[", "]", "#"],
+//     ["#", ".", ".", "[", "]", "[", "]", ".", "#"],
+//     ["#", ".", ".", ".", "[", "]", ".", ".", "#"],
+//     ["#", ".", ".", ".", ".", "@", ".", ".", "#"],
+//     ["#", "#", "#", "#", "#", "#", "#", "#", "#"],
+// ];
+// const testMatrix = [
+//     ["#", "#", "#", "#", "#", "#", "#", "#", "#"],
+//     ["#", ".", ".", ".", ".", ".", ".", ".", "#"],
+//     ["#", ".", ".", ".", ".", "@", ".", ".", "#"],
+//     ["#", ".", ".", ".", "[", "]", ".", ".", "#"],
+//     ["#", ".", ".", "[", "]", "[", "]", ".", "#"],
+//     ["#", ".", ".", "#", "#", ".", ".", ".", "#"],
+//     ["#", "#", "#", "#", "#", "#", "#", "#", "#"],
+// ];
+// const testMatrix = [
+//     ["#", "#", "#", "#", "#", "#", "#", "#", "#"],
+//     ["#", ".", ".", "#", "#", ".", ".", ".", "#"],
+//     ["#", ".", ".", "[", "]", "[", "]", ".", "#"],
+//     ["#", ".", ".", ".", "[", "]", ".", ".", "#"],
+//     ["#", ".", ".", ".", "@", ".", ".", ".", "#"],
+//     ["#", ".", ".", ".", ".", ".", ".", ".", "#"],
+//     ["#", "#", "#", "#", "#", "#", "#", "#", "#"],
+// ];
 const testMatrix = [
     ["#", "#", "#", "#", "#", "#", "#", "#", "#"],
-    ["#", "#", ".", ".", ".", "@", ".", "#", "#"],
-    ["#", "#", ".", ".", "[", "]", ".", "#", "#"],
-    ["#", "#", ".", "[", "]", "[", "]", "#", "#"],
-    ["#", "#", "#", "#", ".", ".", "[", "]", "#"],
-    ["#", "#", ".", ".", ".", ".", ".", ".", "#"],
+    ["#", ".", ".", ".", ".", ".", ".", ".", "#"],
+    ["#", ".", ".", "[", "]", "[", "]", ".", "#"],
+    ["#", ".", ".", ".", "[", "]", ".", ".", "#"],
+    ["#", ".", ".", ".", ".", "@", ".", ".", "#"],
+    ["#", ".", ".", ".", ".", ".", ".", ".", "#"],
     ["#", "#", "#", "#", "#", "#", "#", "#", "#"],
 ];
 
 console.table(testMatrix);
 
-attemptMove({ matrix: testMatrix, dir: "v", currentPosition: { i: 1, j: 5 } });
+attemptMove({ matrix: testMatrix, dir: "^", currentPosition: { i: 4, j: 5 } });
 
 console.table(testMatrix);
 
@@ -436,26 +478,26 @@ console.table(testMatrix);
 
 // console.log(p1(matrix, dirs));
 
-// const p2 = (matrix: string[][], dirs: string[]) => {
-//     dirs.forEach((d: keyof typeof DELTAS, i) => {
-//         const robotLocation = findRobot(matrix);
-//         // console.table(matrix);
-//         attemptMove({ matrix, dir: d, currentPosition: robotLocation });
-//         console.log(d, i);
-//     });
-//     console.table(matrix);
-//
-//     let result = 0;
-//
-//     for (let i = 0; i < matrix.length; i++) {
-//         for (let j = 0; j < matrix[i].length; j++) {
-//             if (matrix[i][j] === "[") {
-//                 result += 100 * i + j;
-//             }
-//         }
-//     }
-//
-//     return result;
-// };
-//
-// console.log(p2(biggerMatrix, dirs));
+const p2 = (matrix: string[][], dirs: string[]) => {
+    dirs.forEach((d: keyof typeof DELTAS, i) => {
+        const robotLocation = findRobot(matrix);
+        // console.table(matrix);
+        attemptMove({ matrix, dir: d, currentPosition: robotLocation });
+        console.log(d, i);
+    });
+    console.table(matrix);
+
+    let result = 0;
+
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[i].length; j++) {
+            if (matrix[i][j] === "[") {
+                result += 100 * i + j;
+            }
+        }
+    }
+
+    return result;
+};
+
+console.log(p2(biggerMatrix, dirs));
