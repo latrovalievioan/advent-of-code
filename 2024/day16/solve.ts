@@ -42,82 +42,61 @@ const getVisitableNeighbours = (matrix: string[][], i: number, j: number) =>
         .map((k: keyof typeof DELTAS) => ({
             i: i + DELTAS[k].i,
             j: j + DELTAS[k].j,
-            k,
+            dir: k,
         }))
         .filter((n) => matrix[n.i][n.j] !== "#");
 
-// const findAllPaths = (matrix: string[][], startI: number, startJ: number) => {
-//     const allPaths = [];
-//
-//     const dfs = (i: number, j: number, path: string[]) => {
-//         console.log('yey')
-//         path.push(`${i},${j}`);
-//
-//         if (matrix[i][j] === "E") {
-//             allPaths.push([...path]);
-//         } else {
-//             const neighbours = getVisitableNeighbours(matrix, i, j).filter(
-//                 (n) => !path.includes(`${n.i},${n.j}`),
-//             );
-//             neighbours.forEach((n) => dfs(n.i, n.j, path));
-//         }
-//
-//         path.pop();
-//     };
-//
-//     dfs(startI, startJ, []);
-//
-//     return allPaths;
-// };
-//
-// const bfs = (matrix: string[][], i: number, j: number) => {
-//     const parents = new Map<string, string>();
-//     const q = []
-//
-//     const neighbours = getVisitableNeighbours(matrix, i, j).filter(
-//         (n) => !parents.has(`${n.i},${n.j}`),
-//     );
-//
-//     neighbours.forEach(n => {
-//         q.push(n)
-//         parents.set(`${n.i},${n.j}`, `${i},${j}`)
-//     })
-//
-//     parents.set(`${i},${j}`, "nah");
-//
-//     while (q.length) {
-//         const current = q.shift();
-//
-//         if (matrix[current.i][current.j] === "E") {
-//             const path = [];
-//             let node = `${current.i},${current.j}`;
-//             while (parents.get(node) !== "nah") {
-//                 const [II,JJ] = node.split(',')
-//                 matrixCopy[II][JJ] = 'X'
-//                 path.push(node);
-//                 node = parents.get(node);
-//             }
-//
-//             path.push(node)
-//
-//             return path.reverse();
-//         }
-//
-//         const neighbours = getVisitableNeighbours(
-//             matrix,
-//             current.i,
-//             current.j,
-//         ).filter((n) => !parents.has(`${n.i},${n.j}`));
-//
-//         neighbours.forEach(n => {
-//             q.push(n)
-//             parents.set(`${n.i},${n.j}`, `${current.i},${current.j}`)
-//         })
-//     }
-// };
-const bfs = (matrix: string[][], i: number, j: number) => {
-    const q = []
-    const visited = new Set<string>()
+const bfs = (
+    matrix: string[][],
+    i: number,
+    j: number,
+    dir: keyof typeof DELTAS,
+) => {
+    const q = [];
+    const visited = new Set<string>();
+
+    visited.add(`${i},${j}`);
+
+    const neighbours = getVisitableNeighbours(matrix, i, j).filter(
+        (n) => !visited.has(`${n.i},${n.j}`),
+    );
+
+    neighbours.forEach((n) => {
+        if (n.dir !== dir) {
+            for (let i = 0; i < 1000; i++) {
+                q.push(n);
+            }
+        }
+
+        q.push(n);
+    });
+
+    while (q.length) {
+        const current = q.shift();
+        dir = current.dir
+
+        if (matrix[current.i][current.j] === "E") {
+            return current;
+        }
+
+        visited.add(`${current.i},${current.j}`);
+
+        const neighbours = getVisitableNeighbours(
+            matrix,
+            current.i,
+            current.j,
+        ).filter((n) => !visited.has(`${n.i},${n.j}`));
+
+        neighbours.forEach((n) => {
+            if (n.dir !== dir) {
+                for (let i = 0; i < 1000; i++) {
+                    q.push(n);
+                }
+            }
+
+            q.push(n);
+        });
+    }
 };
 
 const calcPathValue = (path: string[]) => {
@@ -168,7 +147,7 @@ const calcPathValue = (path: string[]) => {
 const p1 = (matrix: string[][]) => {
     const startCoordinates = findCoordinatesOf(matrix, "S");
 
-    console.log(bfs(matrix, startCoordinates.i, startCoordinates.j))
+    console.log(bfs(matrix, startCoordinates.i, startCoordinates.j, "R"));
 
     // return calcPathValue(bfs(matrix, startCoordinates.i, startCoordinates.j));
 };
