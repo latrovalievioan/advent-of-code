@@ -45,17 +45,29 @@ class Keypad {
         throw new Error("Cannot find target");
     }
 
+    private diffToDir(diffI: number, diffJ: number) {
+            if (diffI === -1) {
+                return "v";
+            } else if (diffJ === 1) {
+                return "<";
+            } else if (diffI === 1) {
+                return "^";
+            } else {
+                return ">";
+            }
+    }
+
     private findPath(
         currentPosition: { i: number; j: number },
         targetPosition: { i: number; j: number },
     ) {
-        const visitedParentMap = new Map<string, string>();
+        const visitedParentMap = new Map<string, {parent: string, cameFrom?: keyof typeof DELTAS}>();
         const q: { i: number; j: number }[] = [];
 
         q.push(currentPosition);
         visitedParentMap.set(
             `${currentPosition.i},${currentPosition.j}`,
-            "START",
+            {parent: "START"}
         );
 
         while (q.length) {
@@ -75,13 +87,32 @@ class Keypad {
                 }))
                 .filter((n) => !visitedParentMap.has(`${n.i},${n.j}`))
                 .filter((n) => this.targetKeypad[n.i][n.j] !== " ")
-                .sort((a, b) =>);
+                .sort((nA, nB) => {
+                    const nAdir = this.diffToDir(currentPosition.i - nA.i, currentPosition.j - nA.j)
+                    const nBdir = this.diffToDir(currentPosition.i - nB.i, currentPosition.j - nB.j)
+
+                    const cameFrom = visitedParentMap.get(`${currentPosition.i},${currentPosition.j}`).cameFrom
+
+                    if(cameFrom) {
+                        return nAdir === cameFrom ? -1 :
+                            nBdir === cameFrom ? 1 :
+                                0
+                    }else return 0
+                })
 
             for (const neighbour of neighbours) {
+                const diffI = currentPosition.i - neighbour.i
+                const diffJ = currentPosition.j - neighbour.j
+
+                const dir = this.diffToDir(diffI, diffJ)
+
                 q.push(neighbour);
                 visitedParentMap.set(
                     `${neighbour.i},${neighbour.j}`,
-                    `${currentPosition.i},${currentPosition.j}`,
+                    {
+                        parent: `${currentPosition.i},${currentPosition.j}`,
+                        cameFrom: dir
+                    }
                 );
             }
         }
@@ -89,27 +120,12 @@ class Keypad {
         let reconstructKey = `${targetPosition.i},${targetPosition.j}`;
         const dirs: string[] = [];
 
-        while (visitedParentMap.get(reconstructKey) !== "START") {
-            const [keyI, keyJ] = reconstructKey.split(",").map(Number);
-            const [parentI, parentJ] = visitedParentMap
-                .get(reconstructKey)
-                .split(",")
-                .map(Number);
+        while (visitedParentMap.get(reconstructKey).parent !== "START") {
+            const val = visitedParentMap.get(reconstructKey)
 
-            const diffI = parentI - keyI;
-            const diffJ = parentJ - keyJ;
+            dirs.push(val.cameFrom);
 
-            if (diffI === -1) {
-                dirs.push("v");
-            } else if (diffJ === 1) {
-                dirs.push("<");
-            } else if (diffI === 1) {
-                dirs.push("^");
-            } else {
-                dirs.push(">");
-            }
-
-            reconstructKey = `${parentI},${parentJ}`;
+            reconstructKey = val.parent;
         }
 
         return dirs.reverse();
@@ -126,7 +142,7 @@ class Keypad {
     }
 }
 
-const sequence = "029A";
+const sequence = "179A";
 
 const x = new Keypad(
     [
