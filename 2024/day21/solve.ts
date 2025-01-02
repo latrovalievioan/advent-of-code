@@ -1,36 +1,102 @@
-const DELTAS = {
-    "^": {
-        i: -1,
-        j: 0,
+import * as fs from 'fs'
+
+const inputs = fs.readFileSync('./input', 'utf-8')
+    .split('\n')
+    .filter(Boolean)
+
+const deltaVariations = [
+    {
+        "^": {
+            i: -1,
+            j: 0,
+        },
+        ">": {
+            i: 0,
+            j: 1,
+        },
+        v: {
+            i: 1,
+            j: 0,
+        },
+        "<": {
+            i: 0,
+            j: -1,
+        },
     },
-    ">": {
-        i: 0,
-        j: 1,
+    {
+        ">": {
+            i: 0,
+            j: 1,
+        },
+        v: {
+            i: 1,
+            j: 0,
+        },
+        "<": {
+            i: 0,
+            j: -1,
+        },
+        "^": {
+            i: -1,
+            j: 0,
+        },
     },
-    v: {
-        i: 1,
-        j: 0,
+    {
+        v: {
+            i: 1,
+            j: 0,
+        },
+        "<": {
+            i: 0,
+            j: -1,
+        },
+        "^": {
+            i: -1,
+            j: 0,
+        },
+        ">": {
+            i: 0,
+            j: 1,
+        },
     },
-    "<": {
-        i: 0,
-        j: -1,
+    {
+        "<": {
+            i: 0,
+            j: -1,
+        },
+        "^": {
+            i: -1,
+            j: 0,
+        },
+        ">": {
+            i: 0,
+            j: 1,
+        },
+        v: {
+            i: 1,
+            j: 0,
+        },
     },
-};
+] as const;
 
 class Keypad {
     typedValues: string[];
     targetKeypad: string[][];
     currentPosition: { i: number; j: number };
+    deltas: (typeof deltaVariations)[number];
 
     constructor(
         targetKeypad: string[][],
         startingPosition: { i: number; j: number },
+        deltas: (typeof deltaVariations)[number],
     ) {
         this.typedValues = [];
 
         this.targetKeypad = targetKeypad;
 
         this.currentPosition = { i: startingPosition.i, j: startingPosition.j };
+
+        this.deltas = deltas;
     }
 
     private getTargetPosition(targetVal: string) {
@@ -46,34 +112,36 @@ class Keypad {
     }
 
     private diffToDir(diffI: number, diffJ: number) {
-            if (diffI === -1) {
-                return "v";
-            } else if (diffJ === 1) {
-                return "<";
-            } else if (diffI === 1) {
-                return "^";
-            } else {
-                return ">";
-            }
+        if (diffI === -1) {
+            return "v";
+        } else if (diffJ === 1) {
+            return "<";
+        } else if (diffI === 1) {
+            return "^";
+        } else {
+            return ">";
+        }
     }
 
     private findPath(
         currentPosition: { i: number; j: number },
         targetPosition: { i: number; j: number },
     ) {
-        const visitedParentMap = new Map<string, {parent: string, cameFrom?: keyof typeof DELTAS}>();
+        const visitedParentMap = new Map<
+            string,
+            { parent: string; cameFrom?: keyof typeof this.deltas }
+        >();
         const q: { i: number; j: number }[] = [];
 
         q.push(currentPosition);
-        visitedParentMap.set(
-            `${currentPosition.i},${currentPosition.j}`,
-            {parent: "START"}
-        );
+        visitedParentMap.set(`${currentPosition.i},${currentPosition.j}`, {
+            parent: "START",
+        });
 
         while (q.length) {
             const currentPosition = q.shift();
 
-            const neighbours = Object.values(DELTAS)
+            const neighbours = Object.values(this.deltas)
                 .filter(
                     (delta) =>
                         this.targetKeypad[currentPosition.i + delta.i] &&
@@ -88,32 +156,39 @@ class Keypad {
                 .filter((n) => !visitedParentMap.has(`${n.i},${n.j}`))
                 .filter((n) => this.targetKeypad[n.i][n.j] !== " ")
                 .sort((nA, nB) => {
-                    const nAdir = this.diffToDir(currentPosition.i - nA.i, currentPosition.j - nA.j)
-                    const nBdir = this.diffToDir(currentPosition.i - nB.i, currentPosition.j - nB.j)
+                    const nAdir = this.diffToDir(
+                        currentPosition.i - nA.i,
+                        currentPosition.j - nA.j,
+                    );
+                    const nBdir = this.diffToDir(
+                        currentPosition.i - nB.i,
+                        currentPosition.j - nB.j,
+                    );
 
-                    const cameFrom = visitedParentMap.get(`${currentPosition.i},${currentPosition.j}`).cameFrom
+                    const cameFrom = visitedParentMap.get(
+                        `${currentPosition.i},${currentPosition.j}`,
+                    ).cameFrom;
 
-                    if(cameFrom) {
-                        return nAdir === cameFrom ? -1 :
-                            nBdir === cameFrom ? 1 :
-                                0
-                    }else return 0
-                })
+                    if (cameFrom) {
+                        return nAdir === cameFrom
+                            ? -1
+                            : nBdir === cameFrom
+                              ? 1
+                              : 0;
+                    } else return 0;
+                });
 
             for (const neighbour of neighbours) {
-                const diffI = currentPosition.i - neighbour.i
-                const diffJ = currentPosition.j - neighbour.j
+                const diffI = currentPosition.i - neighbour.i;
+                const diffJ = currentPosition.j - neighbour.j;
 
-                const dir = this.diffToDir(diffI, diffJ)
+                const dir = this.diffToDir(diffI, diffJ);
 
                 q.push(neighbour);
-                visitedParentMap.set(
-                    `${neighbour.i},${neighbour.j}`,
-                    {
-                        parent: `${currentPosition.i},${currentPosition.j}`,
-                        cameFrom: dir
-                    }
-                );
+                visitedParentMap.set(`${neighbour.i},${neighbour.j}`, {
+                    parent: `${currentPosition.i},${currentPosition.j}`,
+                    cameFrom: dir,
+                });
             }
         }
 
@@ -121,7 +196,7 @@ class Keypad {
         const dirs: string[] = [];
 
         while (visitedParentMap.get(reconstructKey).parent !== "START") {
-            const val = visitedParentMap.get(reconstructKey)
+            const val = visitedParentMap.get(reconstructKey);
 
             dirs.push(val.cameFrom);
 
@@ -142,49 +217,64 @@ class Keypad {
     }
 }
 
-const sequence = "179A";
+const p1 = inputs.reduce((acc, curr) => {
+    let lowest = Infinity
 
-const x = new Keypad(
-    [
-        ["7", "8", "9"],
-        ["4", "5", "6"],
-        ["1", "2", "3"],
-        [" ", "0", "A"],
-    ],
-    { i: 3, j: 2 },
-);
+    for (const deltaVar of deltaVariations) {
+        const x = new Keypad(
+            [
+                ["7", "8", "9"],
+                ["4", "5", "6"],
+                ["1", "2", "3"],
+                [" ", "0", "A"],
+            ],
+            { i: 3, j: 2 },
+            deltaVar,
+        );
 
-for (const val of sequence.split("").filter(Boolean)) {
-    x.pressButton(val);
-}
+        for (const val of curr.split("").filter(Boolean)) {
+            x.pressButton(val);
+        }
 
-console.log(x.typedValues);
+        // console.log(x.typedValues);
 
-const y = new Keypad(
-    [
-        [" ", "^", "A"],
-        ["<", "v", ">"],
-    ],
-    { i: 0, j: 2 },
-);
+        const y = new Keypad(
+            [
+                [" ", "^", "A"],
+                ["<", "v", ">"],
+            ],
+            { i: 0, j: 2 },
+            deltaVar,
+        );
 
-for (const val of x.typedValues) {
-    y.pressButton(val);
-}
+        for (const val of x.typedValues) {
+            y.pressButton(val);
+        }
 
-console.log(y.typedValues);
+        // console.log(y.typedValues);
 
-const z = new Keypad(
-    [
-        [" ", "^", "A"],
-        ["<", "v", ">"],
-    ],
-    { i: 0, j: 2 },
-);
+        const z = new Keypad(
+            [
+                [" ", "^", "A"],
+                ["<", "v", ">"],
+            ],
+            { i: 0, j: 2 },
+            deltaVar,
+        );
 
-for (const val of y.typedValues) {
-    z.pressButton(val);
-}
+        for (const val of y.typedValues) {
+            z.pressButton(val);
+        }
 
-console.log(z.typedValues);
-console.log(z.typedValues.length);
+        if(z.typedValues.length < lowest) {
+            lowest = z.typedValues.length
+        }
+    }
+
+
+    const num = Number(curr.split('').filter(x => !Number.isNaN(Number(x))).join(''))
+
+    return acc + (num * lowest)
+},0)
+
+console.log(p1)
