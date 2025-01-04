@@ -14,7 +14,7 @@ for (let i = 0; i < 1024; i++) {
     matrix[input[i].j][input[i].i] = "#";
 }
 
-console.table(matrix);
+// console.table(matrix);
 
 const DELTAS = {
     UP: {
@@ -70,6 +70,8 @@ const bfs = (matrix: string[][], start: Point, end: Point) => {
     const reconstructedPath = []
     let key = `${end.i},${end.j}`
 
+    if(!visitedParentMap.has(key)) return []
+
     while(key !== 'START') {
         reconstructedPath.push(key) 
         key = visitedParentMap.get(key)
@@ -80,3 +82,14 @@ const bfs = (matrix: string[][], start: Point, end: Point) => {
 
 const p1 = bfs(matrix, {i: 0, j: 0}, {i:70, j:70}).length - 1
 console.log(p1)
+
+const p2Matrix = Array.from({length: 71}, () => Array.from({length: 71}, () => '.'))
+
+for(const byte of input) {
+    p2Matrix[byte.j][byte.i] = "#";
+
+    if(!bfs(p2Matrix, {i: 0, j:0}, {i: 70, j: 70}).length) {
+        console.log(byte)
+        break
+    }
+}
