@@ -1,6 +1,6 @@
 import * as fs from "fs";
 
-const solution1 = fs
+const part1 = fs
     .readFileSync("./01", "utf8")
     .split("\n")
     .filter(Boolean)
@@ -26,9 +26,9 @@ const solution1 = fs
         { value: 50, zero_count: 0 },
     ).zero_count;
 
-// console.log(solution1);
+console.log(part1);
 
-const solution2 = fs
+const part2 = fs
     .readFileSync("./01", "utf8")
     .split("\n")
     .filter(Boolean)
@@ -36,33 +36,44 @@ const solution2 = fs
         (acc, curr) => {
             const [dir, ...count] = curr;
 
-            if (dir === "L") {
-                const newVal = (acc.value + 100 - Number(count.join(""))) % 100;
+            let delta = Number(count.join(""))
+            let newVal = acc.value
+            let newZeroCount = acc.zero_count
 
-                let newZeroCount = acc.zero_count;
-                if (acc.value < newVal) {
-                    newZeroCount++;
+
+            if(dir === 'R'){
+                while(delta > 0) {
+                    if(newVal === 99) {
+                        newVal = 0
+                    }else {
+                        newVal++
+                    }
+
+
+                    delta--
+
+                    if(newVal === 0) newZeroCount++
                 }
-
-                return {
-                    value: newVal,
-                    zero_count: newZeroCount,
-                };
             }
 
-            const newVal = (acc.value + Number(count.join(""))) % 100;
+            if(dir === 'L'){
+                while(delta > 0) {
+                    if(newVal === 0) {
+                        newVal = 99
+                    }else {
+                        newVal--
+                    }
 
-            let newZeroCount = acc.zero_count;
-            if (acc.value > newVal) {
-                newZeroCount++;
+                    delta--
+
+                    if(newVal === 0) newZeroCount++
+                }
             }
 
-            return {
-                value: newVal,
-                zero_count: newZeroCount,
-            };
+            return {value: newVal, zero_count: newZeroCount}
+            
         },
         { value: 50, zero_count: 0 },
     ).zero_count;
 
-console.log(solution2);
+console.log(part2);
