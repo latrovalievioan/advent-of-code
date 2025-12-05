@@ -46,15 +46,17 @@ const p2 = (() => {
             continue
         }
 
-        let highestR = 0
+        let highestR = ranges[i][1]
         let j = i
-        while (j < ranges.length - 1 && ranges[j + 1][0] <= ranges[j][1]) {
+        while (j < ranges.length - 1 && ranges[j + 1][0] <= highestR) {
+            j++
+
             if (ranges[j][1] > highestR) {
                 highestR = ranges[j][1]
             }
 
-            j++
         }
+
 
         if (ranges[j][1] > highestR) {
             highestR = ranges[j][1]
